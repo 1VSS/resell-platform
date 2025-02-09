@@ -1,8 +1,12 @@
 package br.com.vss.resell_platform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "TB_USERS")
@@ -10,9 +14,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(unique = true)
     private String username;
     private String password;
+    @Column(unique = true)
     private String email;
+    @OneToMany(mappedBy = "seller")
+    @JsonIgnore
+    private List<Item> listings;
     LocalDateTime createdAt;
 
     public User(String username, String password, String email) {
@@ -59,6 +68,14 @@ public class User {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public List<Item> getListings() {
+        return listings;
+    }
+
+    public void setListings(List<Item> listings) {
+        this.listings = listings;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
