@@ -3,6 +3,7 @@ package br.com.vss.resell_platform.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,7 +36,7 @@ public class RestExceptionHandler {
 
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
 
-        var errorResponse = new RestErrorMessage(status, errors);
+        RestErrorMessage errorResponse = new RestErrorMessage(status, errors);
 
         return ResponseEntity.status(status).body(errorResponse);
     }
@@ -45,6 +46,28 @@ public class RestExceptionHandler {
 
         String errors = exception.getMessage();
         HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        RestErrorMessage errorResponse = new RestErrorMessage(status, List.of(errors));
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<RestErrorMessage> itemNotFoundHandler(ItemNotFoundException exception) {
+
+        String errors = exception.getMessage();
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        RestErrorMessage errorResponse = new RestErrorMessage(status, List.of(errors));
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidOwnerException.class)
+    public ResponseEntity<RestErrorMessage> invalidOwnerHandler(InvalidOwnerException exception) {
+
+        String errors = exception.getMessage();
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
 
         RestErrorMessage errorResponse = new RestErrorMessage(status, List.of(errors));
 

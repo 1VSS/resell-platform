@@ -32,6 +32,9 @@ public class Item {
         this.listedAt = LocalDateTime.now();
     }
 
+    public Item(){
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,6 +1,7 @@
 package br.com.vss.resell_platform.controller.dto;
 
 import br.com.vss.resell_platform.util.Condition;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,8 +13,7 @@ public record ItemRequest (
         String name,
         String brand,
         Condition condition,
-        @NotNull(message = "Price cant be empty.")
-        @NotBlank(message = "Price cant be blank.")
+        @Min(value = 1, message = "Price must be above 0.")
         BigDecimal price,
         String size
 ) {}
