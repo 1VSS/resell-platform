@@ -3,7 +3,6 @@ package br.com.vss.resell_platform.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -68,6 +67,17 @@ public class RestExceptionHandler {
 
         String errors = exception.getMessage();
         HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+        RestErrorMessage errorResponse = new RestErrorMessage(status, List.of(errors));
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler(ItemNotAvailableException.class)
+    public ResponseEntity<RestErrorMessage> itemNotAvailableHandler(ItemNotAvailableException exception) {
+
+        String errors = exception.getMessage();
+        HttpStatus status = HttpStatus.CONFLICT;
 
         RestErrorMessage errorResponse = new RestErrorMessage(status, List.of(errors));
 

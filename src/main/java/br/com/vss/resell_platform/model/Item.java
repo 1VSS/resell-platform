@@ -1,6 +1,8 @@
 package br.com.vss.resell_platform.model;
 
+import br.com.vss.resell_platform.service.TransactionService;
 import br.com.vss.resell_platform.util.Condition;
+import br.com.vss.resell_platform.util.ItemStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -20,6 +22,9 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "user_id")
     User seller;
+    ItemStatus status;
+    @OneToOne(mappedBy = "item")
+    Transaction transaction;
     LocalDateTime listedAt;
 
     public Item(String name, String brand, Condition condition, BigDecimal price, String size, User seller) {
@@ -29,6 +34,7 @@ public class Item {
         this.price = price;
         this.size = size;
         this.seller = seller;
+        this.status = ItemStatus.AVAILABLE;
         this.listedAt = LocalDateTime.now();
     }
 
@@ -91,6 +97,22 @@ public class Item {
         this.seller = seller;
     }
 
+    public ItemStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ItemStatus status) {
+        this.status = status;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
+    }
+
     public LocalDateTime getListedAt() {
         return listedAt;
     }
@@ -105,6 +127,7 @@ public class Item {
                 ", price=" + price +
                 ", size='" + size + '\'' +
                 ", seller=" + seller +
+                ", status=" + status +
                 ", listedAt=" + listedAt +
                 '}';
     }
