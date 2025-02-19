@@ -1,5 +1,7 @@
 package br.com.vss.resell_platform.controller;
 
+import br.com.vss.resell_platform.controller.dto.FeedDto;
+import br.com.vss.resell_platform.controller.dto.FeedItemDto;
 import br.com.vss.resell_platform.controller.dto.ItemRequest;
 import br.com.vss.resell_platform.exceptions.InvalidOwnerException;
 import br.com.vss.resell_platform.mapper.ItemMapper;
@@ -9,6 +11,8 @@ import br.com.vss.resell_platform.service.ItemService;
 import br.com.vss.resell_platform.service.TransactionService;
 import br.com.vss.resell_platform.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -86,6 +90,23 @@ public class ItemController {
         transactionService.purchaseItem(buyer.get(), item.getSeller(), item);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<FeedDto> feed(@RequestParam(value = "page", defaultValue = "0")int page,
+                                        @RequestParam(value = "pageSize", defaultValue = "10")int pageSize) {
+
+        var listings = itemService.findAll(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"))
+                .map(item ->
+                        new FeedItemDto(
+                                item.getName(),
+                                item.getBrand(),
+                                item.getCondition(),
+                                item.getPrice(),
+                                item.getSize(),
+                                item.getSeller().getUsername()));
+
+        return ResponseEntity.status(HttpStatus.OK).body(new FeedDto(listings.toList(), page, pageSize, listings.getTotalElements()));
     }
 
 }
