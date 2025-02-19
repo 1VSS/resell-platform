@@ -6,6 +6,7 @@ import br.com.vss.resell_platform.mapper.ItemMapper;
 import br.com.vss.resell_platform.model.Item;
 import br.com.vss.resell_platform.model.User;
 import br.com.vss.resell_platform.service.ItemService;
+import br.com.vss.resell_platform.service.TransactionService;
 import br.com.vss.resell_platform.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,11 +23,13 @@ public class ItemController {
     private final ItemService itemService;
     private final ItemMapper itemMapper;
     private final UserService userService;
+    private final TransactionService transactionService;
 
-    public ItemController(ItemService itemService, ItemMapper itemMapper, UserService userService) {
+    public ItemController(ItemService itemService, ItemMapper itemMapper, UserService userService, TransactionService transactionService) {
         this.itemService = itemService;
         this.itemMapper = itemMapper;
         this.userService = userService;
+        this.transactionService = transactionService;
     }
 
     @PostMapping("/items")
@@ -74,6 +77,15 @@ public class ItemController {
         throw new InvalidOwnerException();
     }
 
+    @PostMapping("/item/{id}/buy")
+    public ResponseEntity<Void> purchaseItem(Authentication authentication, @PathVariable Long id) {
 
+        var item = itemService.findById(id).get();
+        Optional<User> buyer = userService.findByUsername(authentication.getName());
+
+        transactionService.purchaseItem(buyer.get(), item.getSeller(), item);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 }

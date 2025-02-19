@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.UniqueElements;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class User {
     @OneToMany(mappedBy = "seller")
     @JsonIgnore
     private List<Item> listings;
+    @OneToMany(mappedBy = "sender")
+    private List<Transaction> purchases;
+    @OneToMany(mappedBy = "receiver")
+    private List<Transaction> sales;
+    private BigDecimal balance;
     LocalDateTime createdAt;
 
     public User(String username, String password, String email) {
@@ -29,6 +35,7 @@ public class User {
         this.password = password;
         this.email = email;
         this.createdAt = LocalDateTime.now();
+        this.balance = BigDecimal.ZERO;
     }
 
     public User() {
@@ -76,6 +83,30 @@ public class User {
 
     public void setListings(List<Item> listings) {
         this.listings = listings;
+    }
+
+    public List<Transaction> getPurchases() {
+        return purchases;
+    }
+
+    public void setPurchases(List<Transaction> purchases) {
+        this.purchases = purchases;
+    }
+
+    public List<Transaction> getSales() {
+        return sales;
+    }
+
+    public void setSales(List<Transaction> sales) {
+        this.sales = sales;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
