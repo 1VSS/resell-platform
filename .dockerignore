@@ -1,0 +1,21 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.dev.yml
+
+# Maven
+target/
+!target/*.jar
+
+# Misc
+README.md
+LICENSE
+*.md
+
+# Frontend folder (handled separately)
+frontend/ 
