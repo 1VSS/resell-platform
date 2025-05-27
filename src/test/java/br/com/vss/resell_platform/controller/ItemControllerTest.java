@@ -222,7 +222,7 @@ class ItemControllerTest {
 
             Mockito.doReturn(itemPage).when(itemService).findAll(any((PageRequest.class)));
 
-            var output = itemController.feed(pageable.getPageNumber(), pageable.getPageSize());
+            var output = itemController.feed(null ,pageable.getPageNumber(), pageable.getPageSize());
 
             assertEquals(HttpStatus.OK, output.getStatusCode());
             assertEquals(feedDto, output.getBody());

@@ -10,6 +10,9 @@ import br.com.vss.resell_platform.model.User;
 import br.com.vss.resell_platform.service.ItemService;
 import br.com.vss.resell_platform.service.TransactionService;
 import br.com.vss.resell_platform.service.UserService;
+import br.com.vss.resell_platform.util.Category;
+import br.com.vss.resell_platform.util.Condition;
+import br.com.vss.resell_platform.util.SubCategory;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -92,15 +96,58 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/feed")
-    public ResponseEntity<FeedDto> feed(@RequestParam(value = "page", defaultValue = "0")int page,
-                                        @RequestParam(value = "pageSize", defaultValue = "10")int pageSize) {
+//    @GetMapping("/feed")
+//    public ResponseEntity<FeedDto> feed(@RequestParam (required = false) String name,
+//                                        @RequestParam(value = "page", defaultValue = "0")int page,
+//                                        @RequestParam(value = "pageSize", defaultValue = "10")int pageSize) {
+//
+//        if (name != null && !name.isEmpty()) {
+//            var listings = itemService.filterByName(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"), name)
+//                    .map(item ->
+//                            new FeedItemDto(
+//                                    item.getName(),
+//                                    item.getBrand(),
+//                                    item.getCondition(),
+//                                    item.getPrice(),
+//                                    item.getSize(),
+//                                    item.getSeller().getUsername()));
+//
+//            return ResponseEntity.status(HttpStatus.OK).body(new FeedDto(listings.toList(), page, pageSize, listings.getTotalElements()));
+//        }
+//
+//        var listings = itemService.findAll(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"))
+//                .map(item ->
+//                        new FeedItemDto(
+//                                item.getName(),
+//                                item.getBrand(),
+//                                item.getCondition(),
+//                                item.getPrice(),
+//                                item.getSize(),
+//                                item.getSeller().getUsername()));
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(new FeedDto(listings.toList(), page, pageSize, listings.getTotalElements()));
+//    }
 
-        var listings = itemService.findAll(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"))
+    @GetMapping("/feed")
+    public ResponseEntity<FeedDto> filter(@RequestParam (required = false) String name,
+                                          @RequestParam (required = false) String brand,
+                                          @RequestParam (required = false) Category category,
+                                          @RequestParam (required = false) SubCategory subCategory,
+                                          @RequestParam (required = false) Condition condition,
+                                          @RequestParam (required = false, defaultValue = "0") BigDecimal lowest,
+                                          @RequestParam (required = false, defaultValue = "999999") BigDecimal highest,
+                                          @RequestParam (required = false) String size,
+                                          @RequestParam(value = "page", defaultValue = "0")int page,
+                                          @RequestParam(value = "pageSize", defaultValue = "10")int pageSize) {
+
+        var listings = itemService.findFiltered(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"),
+                        name, brand, category, subCategory, condition, lowest, highest, size)
                 .map(item ->
                         new FeedItemDto(
                                 item.getName(),
                                 item.getBrand(),
+                                item.getCategory(),
+                                item.getSubCategory(),
                                 item.getCondition(),
                                 item.getPrice(),
                                 item.getSize(),
