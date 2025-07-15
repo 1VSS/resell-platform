@@ -1,5 +1,6 @@
 package br.com.vss.resell_platform.service;
 
+import br.com.vss.resell_platform.controller.SerializablePage;
 import br.com.vss.resell_platform.exceptions.ItemNotFoundException;
 import br.com.vss.resell_platform.model.Item;
 import br.com.vss.resell_platform.repository.ItemRepository;
@@ -7,6 +8,10 @@ import br.com.vss.resell_platform.repository.ItemSpecification;
 import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
 import br.com.vss.resell_platform.util.SubCategory;
+import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,10 +38,14 @@ public class ItemService {
         return itemRepository.findById(id);
     }
 
-    public void save(Item item) {
-        itemRepository.save(item);
+    @Transactional
+    @CachePut(cacheNames = "Items")
+    public Item save(Item item) {
+        return itemRepository.save(item);
     }
 
+    @Transactional
+    @CacheEvict(cacheNames = "Items")
     public void delete(Long id) {
         itemRepository.deleteById(id);
     }
@@ -45,7 +54,8 @@ public class ItemService {
         return itemRepository.findAll(pageable);
     }
 
-    public Page<Item> findFiltered(Pageable page, String name, String brand, Category category, SubCategory subCategory,
+    @Cacheable(cacheNames = "Items")
+    public SerializablePage<Item> findFiltered(Pageable page, String name, String brand, Category category, SubCategory subCategory,
                                    Condition condition, BigDecimal lowest, BigDecimal highest, String size) {
         List<Item> matches = itemRepository.findAll(ItemSpecification.likeName(name)
                 .and(ItemSpecification.likeBrand(brand)
@@ -55,7 +65,8 @@ public class ItemService {
                 .and(ItemSpecification.bySubcategory(subCategory)
                 .and(ItemSpecification.betweenPrice(lowest, highest))), page).toList();
 
-        return new PageImpl<>(matches);
+        Page<Item> pageResult = new PageImpl<>(matches, page, matches.size());
+        return new SerializablePage<>(pageResult);
     }
 
 }

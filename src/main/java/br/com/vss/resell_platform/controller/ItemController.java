@@ -14,6 +14,8 @@ import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
 import br.com.vss.resell_platform.util.SubCategory;
 import jakarta.validation.Valid;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -140,8 +142,12 @@ public class ItemController {
                                           @RequestParam(value = "page", defaultValue = "0")int page,
                                           @RequestParam(value = "pageSize", defaultValue = "10")int pageSize) {
 
-        var listings = itemService.findFiltered(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"),
-                        name, brand, category, subCategory, condition, lowest, highest, size)
+        SerializablePage<Item> serializablePage = itemService.findFiltered(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"),
+                        name, brand, category, subCategory, condition, lowest, highest, size);
+
+        Page<Item> itemPage = serializablePage.toPage(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"));
+
+        var listings = itemPage
                 .map(item ->
                         new FeedItemDto(
                                 item.getName(),

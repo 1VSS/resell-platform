@@ -4,6 +4,7 @@ import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
 import br.com.vss.resell_platform.util.SubCategory;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 public record FeedItemDto(String name,
@@ -13,5 +14,5 @@ public record FeedItemDto(String name,
                           Condition condition,
                           BigDecimal price,
                           String size,
-                          String sellerUsername) {
+                          String sellerUsername) implements Serializable {
 }

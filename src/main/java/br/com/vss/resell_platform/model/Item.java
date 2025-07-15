@@ -6,12 +6,13 @@ import br.com.vss.resell_platform.util.ItemStatus;
 import br.com.vss.resell_platform.util.SubCategory;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TB_ITEMS")
-public class Item {
+public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
