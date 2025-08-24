@@ -5,8 +5,10 @@ import br.com.vss.resell_platform.model.Item;
 import br.com.vss.resell_platform.model.Transaction;
 import br.com.vss.resell_platform.model.User;
 import br.com.vss.resell_platform.repository.TransactionRepository;
+import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
 import br.com.vss.resell_platform.util.ItemStatus;
+import br.com.vss.resell_platform.util.SubCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,7 +51,7 @@ class TransactionServiceTest {
             User user2 = new User("username2", "password2", "email2");
 
 
-            Item item = new Item("name", "brand", Condition.NEW, new BigDecimal("1000"), "size", user);;
+            Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal("1000"), "size", user);;
 
 
             Transaction transaction = new Transaction(user, user2, item);
@@ -76,7 +78,7 @@ class TransactionServiceTest {
             User user2 = new User("username2", "password2", "email2");
 
 
-            Item item = new Item("name", "brand", Condition.NEW, new BigDecimal(1000), "size", user);
+            Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal(1000), "size", user);
 
             item.setStatus(ItemStatus.SOLD);
 

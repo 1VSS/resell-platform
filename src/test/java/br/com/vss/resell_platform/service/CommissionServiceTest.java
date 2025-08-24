@@ -2,7 +2,9 @@ package br.com.vss.resell_platform.service;
 
 import br.com.vss.resell_platform.model.Item;
 import br.com.vss.resell_platform.model.User;
+import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
+import br.com.vss.resell_platform.util.SubCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +26,7 @@ class CommissionServiceTest {
     void shouldCalculateCommission() {
 
         User seller = new User("username", "password", "email");
-        Item item = new Item("name", "brand", Condition.NEW, new BigDecimal("1000"), "size", seller);
+        Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal("1000"), "size", seller);
 
         BigDecimal commissionPercentage = new BigDecimal("0.10");
 

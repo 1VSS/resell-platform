@@ -4,7 +4,9 @@ import br.com.vss.resell_platform.exceptions.ItemNotFoundException;
 import br.com.vss.resell_platform.model.Item;
 import br.com.vss.resell_platform.model.User;
 import br.com.vss.resell_platform.repository.ItemRepository;
+import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
+import br.com.vss.resell_platform.util.SubCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,7 +46,7 @@ class ItemServiceTest {
         void shouldCreateItem(){
 
             User seller = new User("username", "password", "email");
-            Item item = new Item("name", "brand", Condition.NEW, new BigDecimal("1000"), "size", seller);
+            Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal("1000"), "size", seller);
 
             doReturn(item).when(itemRepository).save(itemArgumentCaptor.capture());
 
@@ -64,7 +66,7 @@ class ItemServiceTest {
         void shouldReturnItemById() {
 
             User seller = new User("username", "password", "email");
-            Item item = new Item("name", "brand", Condition.NEW, new BigDecimal("1000"), "size", seller);
+            Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal("1000"), "size", seller);
 
             doReturn(Optional.of(item)).when(itemRepository).findById(longArgumentCaptor.capture());
 
@@ -79,7 +81,7 @@ class ItemServiceTest {
         void shouldThrowExceptionWhenItemIsNotFound() {
 
             User seller = new User("username", "password", "email");
-            Item item = new Item("name", "brand", Condition.NEW, new BigDecimal("1000"), "size", seller);
+            Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal("1000"), "size", seller);
 
             doReturn(Optional.empty()).when(itemRepository).findById(longArgumentCaptor.capture());
 
@@ -97,7 +99,7 @@ class ItemServiceTest {
         void shouldDeleteUser() {
 
             User seller = new User("username", "password", "email");
-            Item item = new Item("name", "brand", Condition.NEW, new BigDecimal("1000"), "size", seller);
+            Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal("1000"), "size", seller);
 
             doNothing().when(itemRepository).deleteById(longArgumentCaptor.capture());
 
@@ -120,7 +122,7 @@ class ItemServiceTest {
         void shouldFindAllItems() {
 
             User seller = new User("username", "password", "email");
-            Item item = new Item("name", "brand", Condition.NEW, new BigDecimal("1000"), "size", seller);
+            Item item = new Item("name", "brand", Category.BOTTOMS, SubCategory.TROUSERS, Condition.NEW, new BigDecimal("1000"), "size", seller);
             Pageable pageable = PageRequest.of(0, 10);
             Page<Item> itemPage = new PageImpl<>(List.of(item), pageable, 0);
 
