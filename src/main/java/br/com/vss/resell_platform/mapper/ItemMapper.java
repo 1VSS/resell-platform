@@ -11,8 +11,7 @@ public class ItemMapper {
 
     public Item toItem(ItemRequest itemRequest, User user) {
 
-
-        return new Item(itemRequest.name(), itemRequest.brand(), itemRequest.condition(),
+        return new Item(itemRequest.name(), itemRequest.brand(), itemRequest.category(), itemRequest.subCategory(), itemRequest.condition(),
                 itemRequest.price(), itemRequest.size(), user);
     }
 

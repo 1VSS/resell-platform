@@ -1,21 +1,25 @@
 package br.com.vss.resell_platform.model;
 
-import br.com.vss.resell_platform.service.TransactionService;
+import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
 import br.com.vss.resell_platform.util.ItemStatus;
+import br.com.vss.resell_platform.util.SubCategory;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TB_ITEMS")
-public class Item {
+public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
     String name;
     String brand;
+    Category category;
+    SubCategory subCategory;
     Condition condition;
     BigDecimal price;
     String size;
@@ -27,9 +31,11 @@ public class Item {
     Transaction transaction;
     LocalDateTime listedAt;
 
-    public Item(String name, String brand, Condition condition, BigDecimal price, String size, User seller) {
+    public Item(String name, String brand, Category category, SubCategory subCategory, Condition condition, BigDecimal price, String size, User seller) {
         this.name = name;
         this.brand = brand;
+        this.category = category;
+        this.subCategory = subCategory;
         this.condition = condition;
         this.price = price;
         this.size = size;
@@ -63,6 +69,22 @@ public class Item {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public SubCategory getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory = subCategory;
     }
 
     public Condition getCondition() {
