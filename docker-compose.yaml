@@ -16,6 +16,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - resell-network
 
   redis:
     image: redis:7-alpine
@@ -30,6 +32,8 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+    networks:
+      - resell-network
 
   app:
     build:
@@ -56,6 +60,8 @@ services:
 
     ports:
       - "8080:8080"
+    networks:
+      - resell-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -103,3 +109,7 @@ volumes:
     driver: local
   pgadmin_data:
     driver: local
+
+networks:
+  resell-network:
+    external: true

@@ -1,5 +1,6 @@
 package br.com.vss.resell_platform.controller;
 
+import br.com.vss.resell_platform.controller.dto.EmailNotificationDto;
 import br.com.vss.resell_platform.controller.dto.FeedDto;
 import br.com.vss.resell_platform.controller.dto.FeedItemDto;
 import br.com.vss.resell_platform.controller.dto.ItemRequest;
@@ -14,7 +15,8 @@ import br.com.vss.resell_platform.util.Category;
 import br.com.vss.resell_platform.util.Condition;
 import br.com.vss.resell_platform.util.SubCategory;
 import jakarta.validation.Valid;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,13 +36,18 @@ public class ItemController {
     private final ItemMapper itemMapper;
     private final UserService userService;
     private final TransactionService transactionService;
+    private final RabbitTemplate rabbitTemplate;
 
-    public ItemController(ItemService itemService, ItemMapper itemMapper, UserService userService, TransactionService transactionService) {
+    public ItemController(ItemService itemService, ItemMapper itemMapper, UserService userService, TransactionService transactionService, RabbitTemplate rabbitTemplate) {
         this.itemService = itemService;
         this.itemMapper = itemMapper;
         this.userService = userService;
         this.transactionService = transactionService;
+        this.rabbitTemplate = rabbitTemplate;
     }
+
+    @Value("${broker.queue.email.name}")
+    private String routingKey;
 
     @PostMapping("/items")
     public ResponseEntity<Void> postItem(Authentication authentication, @RequestBody ItemRequest itemRequest) {
@@ -95,40 +102,15 @@ public class ItemController {
 
         transactionService.purchaseItem(buyer.get(), item.getSeller(), item);
 
+        EmailNotificationDto sellerNotification = new EmailNotificationDto(item.getSeller().getUsername(), "sale", item.getName());
+        EmailNotificationDto buyerNotification = new EmailNotificationDto(buyer.get().getUsername(), "purchase", item.getName());
+
+        rabbitTemplate.convertAndSend(routingKey, buyerNotification);
+        rabbitTemplate.convertAndSend(routingKey, sellerNotification);
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-//    @GetMapping("/feed")
-//    public ResponseEntity<FeedDto> feed(@RequestParam (required = false) String name,
-//                                        @RequestParam(value = "page", defaultValue = "0")int page,
-//                                        @RequestParam(value = "pageSize", defaultValue = "10")int pageSize) {
-//
-//        if (name != null && !name.isEmpty()) {
-//            var listings = itemService.filterByName(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"), name)
-//                    .map(item ->
-//                            new FeedItemDto(
-//                                    item.getName(),
-//                                    item.getBrand(),
-//                                    item.getCondition(),
-//                                    item.getPrice(),
-//                                    item.getSize(),
-//                                    item.getSeller().getUsername()));
-//
-//            return ResponseEntity.status(HttpStatus.OK).body(new FeedDto(listings.toList(), page, pageSize, listings.getTotalElements()));
-//        }
-//
-//        var listings = itemService.findAll(PageRequest.of(page, pageSize, Sort.Direction.DESC, "listedAt"))
-//                .map(item ->
-//                        new FeedItemDto(
-//                                item.getName(),
-//                                item.getBrand(),
-//                                item.getCondition(),
-//                                item.getPrice(),
-//                                item.getSize(),
-//                                item.getSeller().getUsername()));
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(new FeedDto(listings.toList(), page, pageSize, listings.getTotalElements()));
-//    }
 
     @GetMapping("/feed")
     public ResponseEntity<FeedDto> filter(@RequestParam (required = false) String name,
